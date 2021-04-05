@@ -5,6 +5,16 @@
 #include <QtSerialPort>
 #include <ranges>
 
+enum RegAddress : uint16_t {
+    StartStop = 0x1000,
+    Rpm = 0x2000,
+};
+
+enum StartStopCmd : uint16_t {
+    Start = 0x0001,
+    Stop = 0x0005,
+};
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -76,14 +86,14 @@ enum RD {
 
 void MainWindow::start()
 {
-    uint16_t addr = 0x1000;
-    uint16_t data = 0x0001;
+    uint16_t addr = StartStop;
+    uint16_t data = Start;
     m_device->sendRawRequest(QModbusRequest(QModbusRequest::WriteSingleRegister, addr, data), 1);
 }
 
 void MainWindow::stop()
 {
-    uint16_t addr = 0x1000;
+    uint16_t addr = StartStop;
     uint16_t data = 0x0005;
     m_device->sendRawRequest(QModbusRequest(QModbusRequest::WriteSingleRegister, addr, data), 1);
     //    QByteArray data;
@@ -95,10 +105,8 @@ void MainWindow::stop()
     //    //data
     //    data.append(char(0x00));
     //    data.append(char(0x05));
-
     //    uint crc = calcCrc(data);
     //    char* d = (char*)&crc;
-
     //    data.append(d[0]);
     //    data.append(d[1]);
 
@@ -107,11 +115,10 @@ void MainWindow::stop()
 
 void MainWindow::setRpm(int rpm)
 {
-    uint16_t addr = 0x2000;
+    uint16_t addr = Rpm;
     uint16_t data = rpm * 0.416666667;
     m_device->sendRawRequest(QModbusRequest(QModbusRequest::WriteSingleRegister, addr, data), 1);
     //    rpm *= 0.416666667; // 25;
-
     //    QByteArray data;
     //    data.append(char(0x01));
     //    data.append(Write);
@@ -122,13 +129,10 @@ void MainWindow::setRpm(int rpm)
     //    char* r = (char*)&rpm;
     //    data.append(r[1]);
     //    data.append(r[0]);
-
     //    uint crc = calcCrc(data);
     //    char* d = (char*)&crc;
-
     //    data.append(d[0]);
     //    data.append(d[1]);
-
     //    write(data);
 }
 
